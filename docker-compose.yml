@@ -1,0 +1,24 @@
+services:
+  redis-service:
+    image: "redis:7.0.10-bullseye"
+    networks:
+      - backend-network
+    volumes:
+      - "redis-volume:/data"
+  web-service:
+    build: ./web
+    ports:
+      - "80:8000"
+    environment:
+      REDIS_URL: "redis://redis-service:6379"
+    networks:
+      - backend-network
+    depends_on:
+      - redis-service
+    command: "gunicorn page_tracker.app:app --bind 0.0.0.0:8000"
+
+networks:
+    backend-network:
+
+volumes:
+  redis-volume:
